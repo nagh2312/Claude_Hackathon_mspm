@@ -1,111 +1,109 @@
-# Mind Canvas- Reflection Journal
+# Mind Canvas — Reflection Journal
 
-Structured hackathon scaffold for a **capture → normalize → understand → fork → nurture → store → reflect** journaling flow, built with **Next.js (App Router)**, **TypeScript**, and **Tailwind CSS**.
+We built this together for our hackathon — a full **capture → normalize → understand → fork → nurture → store → reflect** flow for a gentler journaling experience. The stack we settled on is **Next.js (App Router)**, **TypeScript**, and **Tailwind CSS**, with the heavy lifting on the server where we could keep API keys safe.
 
-This is **not** medical or crisis care. Crisis UI surfaces static resources only; model output is not a safety system by itself.
+We are not pretending this is medical or crisis care. We wired the crisis path to **static** copy and resources we chose deliberately; anything a model says still has to pass our own routing rules, and we know that is not the same as a real safety system.
 
-## Project layout
+---
 
-| Path | Role |
-|------|------|
-| `app/page.tsx` | Main UI: flow vs Reflection Garden, orchestrates phases |
-| `app/layout.tsx` | Fonts, metadata, shell |
-| `app/globals.css` | Tailwind + view-transition timing |
-| `app/api/process-entry/route.ts` | Server pipeline: normalize (vision optional) + structured analysis + fork |
-| `app/api/transcribe/route.ts` | Optional Whisper transcription (`OPENAI_API_KEY`) |
-| `lib/domain/types.ts` | Shared types for entries, analysis, fork |
-| `lib/domain/crisis-resources.ts` | Static crisis copy + links |
-| `lib/services/safety-router.ts` | Deterministic fork from crisis level |
-| `lib/services/creative-visual.ts` | Sentiment → CSS journal theme |
-| `lib/services/nurture.ts` | One nurture suggestion |
-| `lib/services/mock-analysis.ts` | Offline demo analysis + keyword demo guard |
-| `lib/services/persistence.ts` | `localStorage` persistence (device-local) |
-| `lib/services/reflect.ts` | Aggregations for the garden |
-| `lib/server/run-model-analysis.ts` | Claude JSON analysis (falls back to mock) |
-| `lib/server/normalize-entry.ts` | Claude vision image description |
-| `lib/client/api.ts` | Browser `fetch` helpers |
-| `components/phases/*` | Phase UI: capture, crisis, creative, nurture, reflect |
-| `components/journal/JournalPage.tsx` | Shareable journal “page” presentation |
+## How we organized the codebase
 
-## Local development
+We split things so each of us could own a slice without stepping on the same files all night:
+
+| Path | What we used it for |
+|------|---------------------|
+| `app/page.tsx` | Main experience: today’s flow vs Reflection Garden, and wiring the phases together |
+| `app/layout.tsx` | Fonts, metadata, overall shell |
+| `app/globals.css` | Tailwind base + the view-transition easing we liked |
+| `app/api/process-entry/route.ts` | Our server pipeline: normalize (vision when we have keys), analysis, fork, then nurture/visual only on the safe path |
+| `app/api/transcribe/route.ts` | Optional Whisper path when we have OpenAI credits |
+| `lib/domain/types.ts` | Shared shapes for entries, analysis, fork — one source of truth |
+| `lib/domain/crisis-resources.ts` | Crisis copy and links we wrote and reviewed together |
+| `lib/services/safety-router.ts` | Deterministic fork from crisis level so the UI does not “guess” |
+| `lib/services/creative-visual.ts` | Mapping sentiment into a CSS journal “page” we could ship without image gen |
+| `lib/services/nurture.ts` | Single gentle nudge so it never felt like a homework list |
+| `lib/services/mock-analysis.ts` | Offline / demo analysis so judges and friends could click through without keys |
+| `lib/services/persistence.ts` | `localStorage` for the hackathon — device-local, honest about what it is |
+| `lib/services/reflect.ts` | Helpers for the garden views (timeline, themes, monthly blurb) |
+| `lib/server/run-model-analysis.ts` | Where we call Claude for structured JSON, with fallback to mock |
+| `lib/server/normalize-entry.ts` | Vision description for photos when Anthropic is enabled |
+| `lib/client/api.ts` | Small `fetch` helpers the browser uses |
+| `components/phases/*` | Each phase got its own component so we could parallelize UI work |
+| `components/journal/JournalPage.tsx` | The shareable journal page look we iterated on |
+
+---
+
+## Running it locally (what we do day-of)
 
 ```bash
 npm install
 npm run dev
 ```
 
-The dev server listens on **port 3001** and **all network interfaces** (`0.0.0.0`):
+We pointed dev at **port 3001** and bound to **all interfaces** (`0.0.0.0`) so demos were easier in the same room:
 
-- On this machine: `http://localhost:3001`
-- On the same Wi‑Fi/LAN: `http://<your-computer-LAN-IP>:3001` (others must reach your network; this is not the public internet).
+- On whoever is driving the laptop: `http://localhost:3001`
+- Friends on the same Wi‑Fi: `http://<that laptop’s LAN IP>:3001` (we grab the IP from `ipconfig` on Windows)
 
-**Share with anyone on the internet (temporary tunnel):** in a second terminal, with dev already running:
+That still is not “the whole internet” — same building / network only.
+
+When we wanted a **temporary public link** for someone off-site, we ran a second terminal while dev was up:
 
 ```bash
 npm run tunnel
 ```
 
-Copy the printed `https://....loca.lt` (or similar) URL. Tunnels are fine for demos; we thought of hosting in **Vercel** for a stable public site, (time constraint)
+That uses localtunnel on **3001** and prints a URL (often `https://....loca.lt`) we could drop in chat. Tunnels were perfect for quick demos; when we had the bandwidth we aimed for **Vercel** so the public link did not depend on someone’s laptop staying awake.
 
-> `localhost` alone is only your device. Public access requires a tunnel, port-forwarding + a public IP, or a hosted deploy.
+**Heads-up we learned the hard way:** `localhost` is only that one machine. Random people on the internet cannot hit your localhost; we need either a tunnel, real hosting, or port-forwarding if we are feeling brave.
 
-### Environment variables
+### Env vars we share on the team (never in git)
 
-Copy `.env.example` to `.env.local` (never commit secrets).
+We copied `.env.example` to `.env.local` locally and each kept our own keys out of commits.
 
-- **`ANTHROPIC_API_KEY`** — enables Claude for vision description (photos), structured analysis, and theme/sentiment JSON. If omitted, the app uses **`mock-analysis.ts`** so the UI still runs.
-- **`OPENAI_API_KEY`** — enables `/api/transcribe` for recorded audio. If omitted, use **browser speech** or type/paste text.
+- **`ANTHROPIC_API_KEY`** — turns on Claude for photo description, structured analysis, themes / sentiment JSON. If nobody has a key handy, the app still runs using **`mock-analysis.ts`**.
+- **`OPENAI_API_KEY`** — optional; powers `/api/transcribe` for recorded clips. Without it we still had browser speech and plain typing.
 
-## Production build
+---
+
+## Production build (sanity check before we ship)
 
 ```bash
 npm run build
 npm start
 ```
 
-`npm start` runs the production server on port **3001** (all interfaces) to match `npm run dev`.
+We matched **`npm start`** to **port 3001** and `0.0.0.0` so it behaved like dev and we did not lose ten minutes to “wrong port” during judging.
 
 ---
 
-## Hosting guide
+## How we planned to host it
 
-You need a host that runs a **Node.js** server because this app uses **API routes** (`/api/process-entry`, `/api/transcribe`). A pure static export is **not** enough unless you refactor processing to a separate backend.
+We need **Node** somewhere because we rely on **Next API routes** (`/api/process-entry`, `/api/transcribe`). A flat static export would not carry those unless we split a backend later — we did not want that scope during the hackathon.
 
-### Option A — Vercel (recommended for Next.js)
+### What we tried first — Vercel
 
-1. Push the repository to GitHub (or GitLab / Bitbucket).
-2. In [Vercel](https://vercel.com/), **Import** the repository.
-3. Framework preset: **Next.js** (auto-detected).
-4. Under **Environment Variables**, add:
-   - `ANTHROPIC_API_KEY` — your Anthropic secret
-   - `OPENAI_API_KEY` — optional, for Whisper
-5. Deploy. Vercel runs `next build` and serves the app on HTTPS.
+This was our default for Next:
 
-**Notes**
+1. Repo lives on GitHub (this one).
+2. We imported it in [Vercel](https://vercel.com/).
+3. Next.js was auto-detected.
+4. We added env vars in the dashboard: **`ANTHROPIC_API_KEY`**, and **`OPENAI_API_KEY`** if we wanted Whisper live.
+5. Deploy — Vercel runs `next build` and gives us HTTPS.
 
-- Keys stay **server-side**; the browser never receives them.
-- Free tier is usually enough for demos; watch API spend separately in Anthropic/OpenAI consoles.
+We liked that keys never touched the client bundle.
 
-### Option B — Netlify
+### Netlify (backup plan)
 
-1. Connect the repo in [Netlify](https://www.netlify.com/) → **Add new site** → **Import an existing project**.
-2. Build command: `npm run build`.
-3. Publish directory: **`.next`** is *not* used as static output — choose Netlify’s **Next.js** runtime / adapter if offered, or deploy via **Netlify CLI** with `@netlify/plugin-nextjs` (Netlify docs: “Next.js on Netlify”).
-4. Add the same environment variables in **Site settings → Environment variables**.
+A few of us had Netlify accounts, so we sketched this path too: import the repo, `npm run build`, use Netlify’s **Next.js** support (not a naive “publish `.next` as static files” — that would break our APIs). Same env vars in site settings.
 
-If your Netlify setup only supports static sites, use **Vercel** or a **Node VPS** instead.
+### VPS (if we got extra nerdy)
 
-### Option C — Any VPS (Ubuntu, etc.)
+Node 20+, clone, `npm ci`, `npm run build`, `npm start` under PM2 or systemd, Caddy/nginx in front on **443** proxying to **`127.0.0.1:3001`**, env vars in the unit file.
 
-1. Install Node **20 LTS** (or 18+) and `npm`.
-2. Clone the repo, run `npm ci`, `npm run build`.
-3. Run `npm start` behind a process manager (**systemd**, **PM2**, etc.).
-4. Put **Caddy** or **nginx** in front for HTTPS and reverse-proxy to `127.0.0.1:3001`.
-5. Set environment variables in the service definition (e.g. `Environment=ANTHROPIC_API_KEY=...` for systemd).
+### Docker sketch we kept in notes
 
-### Option D — Docker (portable)
-
-Example `Dockerfile` pattern (you can add this file later if you want container deploys):
+We never committed a `Dockerfile`, but this is the pattern we saved if one of us containerized it later:
 
 ```dockerfile
 FROM node:20-alpine AS deps
@@ -130,10 +128,14 @@ EXPOSE 3001
 CMD ["npm", "start"]
 ```
 
-Build and run: `docker build -t reflection-journal .` then `docker run -p 3001:3001 -e ANTHROPIC_API_KEY=... reflection-journal`.
+Build / run we would use: `docker build -t reflection-journal .` then `docker run -p 3001:3001 -e ANTHROPIC_API_KEY=... reflection-journal`.
 
 ---
 
-## Privacy reminder
+## Privacy (what we tell people who try the demo)
 
-Entries are stored in **browser `localStorage`** by default — clearing site data removes them. For real users, document data handling, crisis limitations, and regional hotline numbers.
+Saved entries live in **browser `localStorage`** — clearing site data wipes them. If we ever ship this for real users, we agreed we owe them clearer data practices, stronger crisis disclaimers, and region-appropriate hotlines than our US-centric defaults.
+
+---
+
+*Built by our team for the hackathon — code, copy, tradeoffs, and late-night commits ours.*

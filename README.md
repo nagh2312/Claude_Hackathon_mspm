@@ -45,7 +45,7 @@ The dev server listens on **port 3001** and **all network interfaces** (`0.0.0.0
 npm run tunnel
 ```
 
-Copy the printed `https://....loca.lt` (or similar) URL. Tunnels are fine for demos; use **Vercel** (see Hosting) for a stable public site.
+Copy the printed `https://....loca.lt` (or similar) URL. Tunnels are fine for demos; we thought of hosting in **Vercel** for a stable public site, (time constraint)
 
 > `localhost` alone is only your device. Public access requires a tunnel, port-forwarding + a public IP, or a hosted deploy.
 

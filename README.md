@@ -1,4 +1,4 @@
-# Reflection Journal
+# Mind Canvas- Reflection Journal
 
 Structured hackathon scaffold for a **capture → normalize → understand → fork → nurture → store → reflect** journaling flow, built with **Next.js (App Router)**, **TypeScript**, and **Tailwind CSS**.
 

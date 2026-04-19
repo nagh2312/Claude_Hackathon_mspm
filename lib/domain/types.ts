@@ -79,3 +79,12 @@ export interface ProcessEntryResponse {
   nurture?: NurtureSuggestion;
   usedMockAnalysis: boolean;
 }
+
+/** Server-persisted daily journal row (see `data/journals.json`). */
+export interface CloudJournalEntry {
+  id: string;
+  /** YYYY-MM-DD */
+  date: string;
+  body: string;
+  createdAt: string;
+}

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
+import { AppProviders } from "@/components/providers/AppProviders";
+import { isGoogleAuthConfigured } from "@/lib/auth/options";
 import "./globals.css";
 
 const inter = Inter({
@@ -20,9 +22,12 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const googleAuthEnabled = isGoogleAuthConfigured();
   return (
     <html lang="en" className={`${inter.variable} ${fraunces.variable}`}>
-      <body className="font-sans">{children}</body>
+      <body className="font-sans">
+        <AppProviders googleAuthEnabled={googleAuthEnabled}>{children}</AppProviders>
+      </body>
     </html>
   );
 }

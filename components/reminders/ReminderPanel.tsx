@@ -32,7 +32,7 @@ export function ReminderPanel() {
 
   return (
     <section className="rounded-3xl border border-dashed border-zinc-300 bg-white/60 p-5 text-sm text-zinc-700">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">Reminders</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">Feature 4 — Reminders</p>
       <div className="mt-3 grid gap-6 md:grid-cols-2">
         <div className="space-y-3">
           <h3 className="font-medium text-zinc-900">Desktop notifications</h3>

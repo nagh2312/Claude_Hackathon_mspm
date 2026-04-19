@@ -40,6 +40,7 @@ export function CapturePhase({ onSubmit, disabled }: CapturePhaseProps) {
   const [speechNote, setSpeechNote] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
+  const photoInputRef = useRef<HTMLInputElement | null>(null);
 
   const onPickImage = useCallback(async (file: File | null) => {
     if (!file) {
@@ -135,23 +136,32 @@ export function CapturePhase({ onSubmit, disabled }: CapturePhaseProps) {
         </p>
       </header>
 
-      <div className="flex flex-wrap gap-2">
+      <div
+        className="flex flex-wrap gap-2 rounded-2xl border border-zinc-200 bg-white/90 p-2 shadow-sm"
+        role="tablist"
+        aria-label="Capture mode"
+      >
         {(
           [
-            ["text", "Free write"],
-            ["voice", "Voice"],
-            ["photo", "Photo"],
+            ["text", "✎ Text", "Type or paste"],
+            ["voice", "🎤 Voice", "Speak or record"],
+            ["photo", "📷 Photo", "Upload an image"],
           ] as const
-        ).map(([id, label]) => (
+        ).map(([id, label, hint]) => (
           <button
             key={id}
             type="button"
+            role="tab"
+            aria-selected={mode === id}
             onClick={() => setMode(id)}
-            className={`rounded-full px-4 py-2 text-sm transition ${
-              mode === id ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-700 hover:bg-zinc-200"
+            className={`flex min-w-[7.5rem] flex-1 flex-col items-start rounded-xl px-4 py-3 text-left text-sm transition sm:min-w-0 sm:flex-1 ${
+              mode === id
+                ? "bg-zinc-900 text-white shadow-md ring-2 ring-zinc-900 ring-offset-2 ring-offset-white"
+                : "bg-zinc-50 text-zinc-800 ring-1 ring-zinc-200 hover:bg-zinc-100"
             }`}
           >
-            {label}
+            <span className="font-semibold">{label}</span>
+            <span className={`mt-0.5 text-xs ${mode === id ? "text-zinc-300" : "text-zinc-500"}`}>{hint}</span>
           </button>
         ))}
       </div>
@@ -204,16 +214,32 @@ export function CapturePhase({ onSubmit, disabled }: CapturePhaseProps) {
 
       {mode === "photo" ? (
         <div className="space-y-4">
-          <label className="flex cursor-pointer flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-zinc-300 bg-zinc-50/80 p-8 text-center text-sm text-zinc-600">
-            <span className="font-medium text-zinc-800">Drop a photo or tap to upload</span>
-            <span className="text-xs">Desk, sky, snack, messy room — context is yours.</span>
-            <input
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={(e) => void onPickImage(e.target.files?.[0] ?? null)}
-            />
-          </label>
+          <input
+            ref={photoInputRef}
+            id="capture-photo-file"
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            onChange={(e) => void onPickImage(e.target.files?.[0] ?? null)}
+          />
+          <div className="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-zinc-300 bg-zinc-50/90 p-8 text-center text-sm text-zinc-600">
+            <p className="font-medium text-zinc-800">Add a photo (required for this mode)</p>
+            <p className="max-w-md text-xs text-zinc-500">
+              Use the button so the file picker always opens reliably in every browser.
+            </p>
+            <button
+              type="button"
+              onClick={() => photoInputRef.current?.click()}
+              className="rounded-full bg-zinc-900 px-6 py-2.5 text-sm font-semibold text-white shadow-md hover:bg-zinc-800"
+            >
+              Choose photo…
+            </button>
+            {imageFile ? (
+              <p className="text-xs text-zinc-600">
+                Selected: <span className="font-medium text-zinc-900">{imageFile.name}</span>
+              </p>
+            ) : null}
+          </div>
           {imagePreview ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={imagePreview} alt="Selected" className="max-h-64 rounded-xl object-contain shadow-md" />

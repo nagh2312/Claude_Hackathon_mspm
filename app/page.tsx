@@ -162,32 +162,92 @@ export default function HomePage() {
             borderBottomColor: moodShell.surfaceStyle.borderColor as string,
           }}
         >
-          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Feeling summary</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Feeling summary (feature 2)</p>
           <p className="mt-1 text-sm font-medium text-zinc-900">{moodShell.feelingTag}</p>
           <p className="mt-2 text-sm leading-relaxed text-zinc-700">{moodShell.moodSummary}</p>
+          <p className="mt-3 text-xs text-zinc-500">
+            After you process an entry or chat with the companion, gradients and cards shift to match the tone of your
+            words.
+          </p>
         </div>
 
-        <nav className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div
-            className="flex flex-wrap gap-2 rounded-full p-1 shadow-sm ring-1 ring-zinc-200/80"
-            style={moodShell.surfaceStyle}
-          >
-            {navButton("companion", "Companion")}
-            {navButton("flow", "Today’s flow")}
-            {navButton("garden", "Reflection Garden")}
-            {navButton("daily", "Daily journal")}
-          </div>
-          {result?.usedMockAnalysis ? (
-            <p className="text-xs text-amber-800">
-              Demo analysis mode — add <code className="rounded bg-amber-100 px-1">ANTHROPIC_API_KEY</code> for
-              Claude.
-            </p>
-          ) : result && !result.usedMockAnalysis ? (
-            <p className="text-xs text-zinc-600">Structured response from Claude (server-side).</p>
-          ) : null}
-        </nav>
+        <section className="rounded-2xl border border-zinc-200 bg-white/70 p-4 text-sm text-zinc-700 shadow-sm sm:p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">What you can do here</p>
+          <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+            <li>
+              <button
+                type="button"
+                className="text-left font-medium text-zinc-900 underline decoration-zinc-300 decoration-2 underline-offset-2 hover:decoration-zinc-900"
+                onClick={() => setView("companion")}
+              >
+                Feature 1 — AI companion chat
+              </button>
+              <p className="mt-1 text-xs text-zinc-600">Open the Companion tab for a warm back-and-forth.</p>
+            </li>
+            <li>
+              <button
+                type="button"
+                className="text-left font-medium text-zinc-900 underline decoration-zinc-300 decoration-2 underline-offset-2 hover:decoration-zinc-900"
+                onClick={() => setView("flow")}
+              >
+                Today’s flow — text, voice &amp; photo
+              </button>
+              <p className="mt-1 text-xs text-zinc-600">
+                Voice and photo capture live in this tab (pick ✎ Text, 🎤 Voice, or 📷 Photo in the card).
+              </p>
+            </li>
+            <li>
+              <button
+                type="button"
+                className="text-left font-medium text-zinc-900 underline decoration-zinc-300 decoration-2 underline-offset-2 hover:decoration-zinc-900"
+                onClick={() => {
+                  refreshEntries();
+                  setView("garden");
+                }}
+              >
+                Reflection Garden
+              </button>
+              <p className="mt-1 text-xs text-zinc-600">Past entries saved on this device.</p>
+            </li>
+            <li>
+              <button
+                type="button"
+                className="text-left font-medium text-zinc-900 underline decoration-zinc-300 decoration-2 underline-offset-2 hover:decoration-zinc-900"
+                onClick={() => setView("daily")}
+              >
+                Feature 3 — Daily journal + Google
+              </button>
+              <p className="mt-1 text-xs text-zinc-600">Sign in above, then save journals to the server.</p>
+            </li>
+          </ul>
+          <p className="mt-3 text-xs text-zinc-500">
+            Feature 4 — <strong>Reminders</strong> (desktop + email) are at the bottom of the page after you pick a tab.
+          </p>
+        </section>
 
-        <ReminderPanel />
+        <nav className="sticky top-0 z-30 -mx-4 border-b border-zinc-200/80 bg-white/85 px-4 py-3 backdrop-blur-md sm:-mx-8 sm:px-8">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div
+              className="flex flex-wrap gap-2 rounded-full p-1 shadow-sm ring-1 ring-zinc-200/80"
+              style={moodShell.surfaceStyle}
+            >
+              {navButton("companion", "Companion")}
+              {navButton("flow", "Today’s flow")}
+              {navButton("garden", "Reflection Garden")}
+              {navButton("daily", "Daily journal")}
+            </div>
+            {result?.usedMockAnalysis ? (
+              <p className="text-xs text-amber-800">
+                Demo analysis mode — add <code className="rounded bg-amber-100 px-1">ANTHROPIC_API_KEY</code> for
+                Claude.
+              </p>
+            ) : result && !result.usedMockAnalysis ? (
+              <p className="text-xs text-zinc-600">Structured response from Claude (server-side).</p>
+            ) : (
+              <p className="text-xs text-zinc-500">Tip: use Today’s flow for voice/photo capture.</p>
+            )}
+          </div>
+        </nav>
 
         {view === "companion" ? (
           <CompanionChat onMoodFromAnalysis={applyMoodFromAnalysis} surfaceStyle={moodShell.surfaceStyle} />
@@ -200,7 +260,10 @@ export default function HomePage() {
         {view === "flow" ? (
           <div className="space-y-8">
             {phase === "capture" ? (
-              <div style={moodShell.surfaceStyle} className="rounded-3xl border border-transparent p-1">
+              <div
+                className="rounded-3xl border border-zinc-200/90 bg-white/95 p-4 shadow-md sm:p-8"
+                style={moodShell.surfaceStyle}
+              >
                 <CapturePhase onSubmit={handleSubmit} disabled={isPending} />
               </div>
             ) : null}
@@ -261,6 +324,8 @@ export default function HomePage() {
             {error ? <p className="text-sm text-rose-700">{error}</p> : null}
           </div>
         ) : null}
+
+        <ReminderPanel />
       </div>
     </main>
   );

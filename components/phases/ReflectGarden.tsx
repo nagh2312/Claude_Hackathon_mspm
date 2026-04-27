@@ -31,7 +31,7 @@ export function ReflectGarden({ entries }: ReflectGardenProps) {
   return (
     <section className="space-y-12">
       <header>
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">Phase 7 — Reflect</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">Long view</p>
         <h2 className="mt-2 font-display text-3xl text-zinc-900">Your long view</h2>
         <p className="mt-2 max-w-2xl text-zinc-600">{insight}</p>
       </header>
@@ -39,7 +39,7 @@ export function ReflectGarden({ entries }: ReflectGardenProps) {
       <div className="grid gap-8 lg:grid-cols-2">
         <div className="rounded-3xl border border-zinc-200 bg-white p-6 shadow-sm">
           <h3 className="font-semibold text-zinc-900">Mood timeline</h3>
-          <p className="text-xs text-zinc-500">Valence by day — taller means more positive.</p>
+          <p className="text-xs text-zinc-500">Each bar is a day. Taller usually means a lighter emotional tint.</p>
           <div className="mt-6 flex h-40 items-end gap-1">
             {timeline.slice(-24).map((pt, idx) => {
               const h = Math.round(((pt.valence + 1) / 2) * 100);
@@ -76,7 +76,7 @@ export function ReflectGarden({ entries }: ReflectGardenProps) {
 
       <div>
         <h3 className="font-semibold text-zinc-900">Art gallery</h3>
-        <p className="text-sm text-zinc-600">Pages you chose to keep — a visual autobiography in fragments.</p>
+        <p className="text-sm text-zinc-600">Pages you chose to keep, like a visual autobiography in fragments.</p>
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           {gallery.slice(0, 6).map((e) => (
             <JournalPage

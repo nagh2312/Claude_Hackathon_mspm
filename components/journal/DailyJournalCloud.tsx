@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 import { useSession } from "next-auth/react";
 import { fetchCloudJournals, saveCloudJournal } from "@/lib/client/api";
-import { useAppFlags } from "@/components/providers/AppProviders";
 import { touchJournalActivity } from "@/lib/services/persistence";
 import type { CloudJournalEntry } from "@/lib/domain/types";
 
@@ -14,7 +13,6 @@ interface DailyJournalCloudProps {
 
 export function DailyJournalCloud({ surfaceStyle }: DailyJournalCloudProps) {
   const { data: session, status } = useSession();
-  const { googleAuthEnabled } = useAppFlags();
   const [body, setBody] = useState("");
   const [entries, setEntries] = useState<CloudJournalEntry[]>([]);
   const [loading, setLoading] = useState(false);
@@ -30,7 +28,7 @@ export function DailyJournalCloud({ surfaceStyle }: DailyJournalCloudProps) {
       const list = await fetchCloudJournals();
       setEntries(list);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not load cloud journals.");
+      setError(e instanceof Error ? e.message : "We could not load your past entries just now.");
     } finally {
       setLoading(false);
     }
@@ -50,29 +48,26 @@ export function DailyJournalCloud({ surfaceStyle }: DailyJournalCloudProps) {
       await saveCloudJournal({ body });
       touchJournalActivity();
       setBody("");
-      setNote("Saved to your account on this server.");
+      const google = session?.user?.provider === "google";
+      setNote(
+        google
+          ? "Saved. A private copy is also kept with the Google account you used to sign in."
+          : "Saved to your Mind Canvas account."
+      );
       await refresh();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not save.");
+      setError(e instanceof Error ? e.message : "We could not save that. Try again in a moment.");
     } finally {
       setSaving(false);
     }
-  }, [body, refresh]);
-
-  if (!googleAuthEnabled) {
-    return null;
-  }
+  }, [body, refresh, session?.user?.provider]);
 
   if (status === "loading") {
-    return <p className="text-sm text-zinc-500">Loading session…</p>;
+    return <p className="text-sm text-zinc-500">Loading…</p>;
   }
 
   if (!session?.user) {
-    return (
-      <p className="text-sm text-zinc-600">
-        Sign in with Google on the bar above to keep a daily journal synced to this deployment.
-      </p>
-    );
+    return <p className="text-sm text-zinc-600">Sign in to keep a daily journal that follows you across visits.</p>;
   }
 
   return (
@@ -86,10 +81,9 @@ export function DailyJournalCloud({ surfaceStyle }: DailyJournalCloudProps) {
     >
       <header className="mb-6 space-y-2">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">Daily journal</p>
-        <h2 className="font-display text-3xl text-zinc-900">Write for today</h2>
+        <h2 className="font-display text-3xl text-zinc-900">How was today, really?</h2>
         <p className="text-sm text-zinc-600">
-          Entries are stored in <code className="rounded bg-zinc-100 px-1 text-xs">data/journals.json</code> on the
-          server (hackathon-friendly). For production, swap in a database.
+          Write the messy version. You can always come back and add more later.
         </p>
       </header>
 
@@ -98,7 +92,7 @@ export function DailyJournalCloud({ surfaceStyle }: DailyJournalCloudProps) {
           value={body}
           onChange={(e) => setBody(e.target.value)}
           rows={8}
-          placeholder="What happened, what you felt, what you hope tomorrow remembers…"
+          placeholder="Tiny wins, loud worries, something kind someone said…"
           className="w-full rounded-2xl border border-zinc-300 bg-white px-4 py-3 text-sm text-zinc-900 shadow-inner outline-none focus:border-zinc-500"
         />
         <div className="flex flex-wrap gap-3">
@@ -108,7 +102,7 @@ export function DailyJournalCloud({ surfaceStyle }: DailyJournalCloudProps) {
             disabled={saving || !body.trim()}
             className="rounded-full bg-emerald-700 px-5 py-3 text-sm font-semibold text-white shadow-md hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {saving ? "Saving…" : "Save today’s journal"}
+            {saving ? "Saving…" : "Save today"}
           </button>
           <button
             type="button"
@@ -124,10 +118,10 @@ export function DailyJournalCloud({ surfaceStyle }: DailyJournalCloudProps) {
       </div>
 
       <div className="mt-10">
-        <h3 className="text-sm font-semibold text-zinc-800">Recent cloud entries</h3>
+        <h3 className="text-sm font-semibold text-zinc-800">Recent entries</h3>
         <ul className="mt-4 space-y-4">
           {entries.length === 0 && !loading ? (
-            <li className="text-sm text-zinc-500">No cloud entries yet — your first line can be imperfect.</li>
+            <li className="text-sm text-zinc-500">Nothing here yet. One honest sentence is enough to start.</li>
           ) : null}
           {entries.map((e) => (
             <li key={e.id} className="rounded-2xl border border-zinc-200 bg-white/80 p-4">

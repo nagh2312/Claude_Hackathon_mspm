@@ -22,7 +22,7 @@ export function ReminderPanel() {
         setEmailErr(res.error ?? "Email could not be sent.");
         return;
       }
-      setEmailNote("Sent — check your inbox (and spam) in a minute.");
+      setEmailNote("Sent. Check your inbox (and spam) in a minute.");
     } catch (e) {
       setEmailErr(e instanceof Error ? e.message : "Email request failed.");
     } finally {
@@ -32,12 +32,12 @@ export function ReminderPanel() {
 
   return (
     <section className="rounded-3xl border border-dashed border-zinc-300 bg-white/60 p-5 text-sm text-zinc-700">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">Feature 4 — Reminders</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">Reminders</p>
       <div className="mt-3 grid gap-6 md:grid-cols-2">
         <div className="space-y-3">
           <h3 className="font-medium text-zinc-900">Desktop notifications</h3>
           <p className="text-xs text-zinc-600">
-            We’ll ping once a day at your chosen hour if you haven’t journaled yet — with a gentle historical nudge.
+            We will ping once a day at your chosen hour if you have not journaled yet, with a gentle historical nudge.
           </p>
           {reminders.permission === "unsupported" ? (
             <p className="text-xs text-amber-800">This browser doesn’t support notifications.</p>

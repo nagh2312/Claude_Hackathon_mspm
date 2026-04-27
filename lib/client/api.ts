@@ -65,6 +65,49 @@ export async function saveCloudJournal(payload: { body: string; date?: string })
   return data.entry;
 }
 
+export async function registerAccount(payload: {
+  email: string;
+  password: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  const res = await fetch("/api/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = (await res.json().catch(() => ({}))) as { error?: string };
+  if (!res.ok) return { ok: false, error: data.error ?? "Could not create account." };
+  return { ok: true };
+}
+
+export async function fetchUserProfile(): Promise<{
+  profile: import("@/lib/domain/user-profile").UserPersonalityProfile | null;
+}> {
+  const res = await fetch("/api/user-profile", { method: "GET" });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(err.error ?? "Could not load profile");
+  }
+  return res.json() as Promise<{
+    profile: import("@/lib/domain/user-profile").UserPersonalityProfile | null;
+  }>;
+}
+
+export async function saveUserProfile(payload: {
+  onboardingComplete: boolean;
+  archetype: import("@/lib/domain/user-profile").MascotArchetype;
+  tags: string[];
+}): Promise<void> {
+  const res = await fetch("/api/user-profile", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(err.error ?? "Could not save profile");
+  }
+}
+
 export async function sendJournalReminderEmail(): Promise<{ ok: boolean; error?: string }> {
   const res = await fetch("/api/reminders/email", { method: "POST" });
   const data = (await res.json().catch(() => ({}))) as { error?: string };

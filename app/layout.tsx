@@ -17,8 +17,8 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Reflection Journal",
-  description: "Capture → understand → fork → nurture → reflect. Not clinical care.",
+  title: "Mind Canvas",
+  description: "A gentle journaling home with a companion that cheers you on. Not clinical care.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

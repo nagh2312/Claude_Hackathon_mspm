@@ -82,7 +82,7 @@ export function useJournalReminders() {
     if (last === today) return;
     try {
       const body = buildDesktopReminderBody();
-      new Notification("Reflection Journal — gentle nudge", { body });
+      new Notification("Mind Canvas: gentle nudge", { body });
     } catch {
       /* ignore */
     }
@@ -118,7 +118,7 @@ export function useJournalReminders() {
     sendTestNotification: () => {
       if (permission !== "granted") return;
       const body = buildDesktopReminderBody();
-      new Notification("Reflection Journal — test nudge", { body });
+      new Notification("Mind Canvas: test nudge", { body });
     },
   };
 }

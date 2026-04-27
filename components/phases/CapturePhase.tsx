@@ -72,7 +72,7 @@ export function CapturePhase({ onSubmit, disabled }: CapturePhaseProps) {
       const said = ev.results[0]?.[0]?.transcript ?? "";
       setText((t) => (t ? `${t}\n${said}` : said));
     };
-    rec.onerror = () => setSpeechNote("Speech capture hit an error — you can still type.");
+    rec.onerror = () => setSpeechNote("Speech capture hit an error. You can still type.");
     rec.start();
     setSpeechNote("Listening… speak naturally, then pause.");
   }, []);
@@ -100,7 +100,7 @@ export function CapturePhase({ onSubmit, disabled }: CapturePhaseProps) {
         setSpeechNote("Server transcription complete.");
       } catch {
         setSpeechNote(
-          "Server transcription is unavailable (add OPENAI_API_KEY) — try typing, or use the speech button in Chrome."
+          "We could not reach the transcription service. Try typing, or use the in browser speech button in Chrome."
         );
       }
     };
@@ -129,10 +129,10 @@ export function CapturePhase({ onSubmit, disabled }: CapturePhaseProps) {
   return (
     <section className="space-y-8">
       <header className="space-y-3">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">Phase 1 — Capture</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500">Start here</p>
         <h1 className="font-display text-4xl text-zinc-900 sm:text-5xl">Start wherever you are</h1>
         <p className="max-w-2xl text-zinc-600">
-          No scales, no preamble. Choose a door — words, voice, or a photo — and let it be imperfect.
+          No scales, no preamble. Choose a door: words, voice, or a photo, and let it be imperfect.
         </p>
       </header>
 
@@ -168,7 +168,7 @@ export function CapturePhase({ onSubmit, disabled }: CapturePhaseProps) {
 
       {mode === "text" ? (
         <label className="block space-y-2">
-          <span className="text-sm text-zinc-600">Write anything — fragments are welcome.</span>
+          <span className="text-sm text-zinc-600">Write anything. Fragments are welcome.</span>
           <textarea
             className="min-h-[220px] w-full rounded-2xl border border-zinc-200 bg-white/80 p-4 text-base text-zinc-900 shadow-inner outline-none ring-zinc-300 focus:ring-2"
             value={text}
@@ -207,7 +207,7 @@ export function CapturePhase({ onSubmit, disabled }: CapturePhaseProps) {
             className="min-h-[160px] w-full rounded-xl border border-zinc-200 bg-white p-3 text-sm text-zinc-900 outline-none ring-zinc-300 focus:ring-2"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Transcript appears here — edit freely."
+            placeholder="Transcript appears here. Edit freely."
           />
         </div>
       ) : null}
@@ -266,7 +266,7 @@ export function CapturePhase({ onSubmit, disabled }: CapturePhaseProps) {
         >
           Continue
         </button>
-        <p className="text-xs text-zinc-500">Phases 2–3 run privately on the server when you continue.</p>
+        <p className="text-xs text-zinc-500">When you continue, your words stay private on our server while we listen.</p>
       </div>
     </section>
   );

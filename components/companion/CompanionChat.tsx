@@ -18,7 +18,7 @@ export function CompanionChat({ onMoodFromAnalysis, surfaceStyle }: CompanionCha
     {
       role: "assistant",
       content:
-        "Hey — I'm here to listen, not to judge. What's alive for you today, even if it's messy or small?",
+        "Hey, I am here to listen, not to judge. What is alive for you today, even if it is messy or small?",
     },
   ]);
   const [input, setInput] = useState("");

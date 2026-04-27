@@ -57,7 +57,7 @@ export function JournalPage({ title, body, theme, subtitle }: JournalPageProps) 
         {body}
       </div>
       <footer className="relative mt-10 flex items-center justify-between text-xs text-zinc-500">
-        <span>Made for you — not a medical record</span>
+        <span>Made for you, not a medical record</span>
         <span className="rounded-full bg-white/60 px-3 py-1 text-[10px] uppercase tracking-widest text-zinc-500">
           {theme.palette} · {theme.typography}
         </span>

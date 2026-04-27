@@ -6,7 +6,7 @@ export function CrisisSupportPhase() {
   return (
     <section className="space-y-8">
       <header className="space-y-4 rounded-3xl bg-rose-50/80 p-8 ring-1 ring-rose-100">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-rose-700">Phase 4b — Support path</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-rose-700">Extra support</p>
         <h2 className="font-display text-3xl text-rose-950 sm:text-4xl">{CRISIS_SUPPORT_COPY.title}</h2>
         <p className="max-w-2xl text-lg leading-relaxed text-rose-900/90">{CRISIS_SUPPORT_COPY.lead}</p>
         <p className="text-sm text-rose-800/80">{CRISIS_SUPPORT_COPY.footer}</p>

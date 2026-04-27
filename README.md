@@ -63,6 +63,10 @@ We copied `.env.example` to `.env.local` locally and each kept our own keys out 
 
 - **`ANTHROPIC_API_KEY`** — turns on Claude for photo description, structured analysis, themes / sentiment JSON. If nobody has a key handy, the app still runs using **`mock-analysis.ts`**.
 - **`OPENAI_API_KEY`** — optional; powers `/api/transcribe` for recorded clips. Without it we still had browser speech and plain typing.
+- **Google sign-in (NextAuth)** — optional for the core flow; when set, cloud journal APIs can tie to a user. We use **`GOOGLE_CLIENT_ID`**, **`GOOGLE_CLIENT_SECRET`**, **`NEXTAUTH_SECRET`**, and **`NEXTAUTH_URL`** (local: `http://localhost:3001`; production: your real `https://…` URL with matching Google OAuth redirect URI).
+- **Email nudges (Resend)** — optional: **`RESEND_API_KEY`** and **`EMAIL_FROM`** for the reminder route; fine to skip for a first deploy.
+
+When we deploy to **Vercel**, we copy the same names into **Project → Settings → Environment Variables** (Production + Preview if we want previews to work too). After the first production URL exists, we update **Google Cloud Console** OAuth “Authorized JavaScript origins” and “Authorized redirect URIs” to include that URL and `…/api/auth/callback/google`.
 
 ---
 
@@ -79,7 +83,7 @@ We matched **`npm start`** to **port 3001** and `0.0.0.0` so it behaved like dev
 
 ## How we planned to host it
 
-We need **Node** somewhere because we rely on **Next API routes** (`/api/process-entry`, `/api/transcribe`). A flat static export would not carry those unless we split a backend later — we did not want that scope during the hackathon.
+We need **Node** somewhere because we rely on **Next API routes** (e.g. `/api/process-entry`, `/api/transcribe`, `/api/auth`, `/api/journals`, `/api/companion-chat`, `/api/reminders/email`). A flat static export would not carry those unless we split a backend later — we did not want that scope during the hackathon.
 
 ### What we tried first — Vercel
 

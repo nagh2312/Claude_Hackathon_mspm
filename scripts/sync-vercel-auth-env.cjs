@@ -5,12 +5,12 @@
  * and complete the browser/device flow — that step cannot be completed by an agent.
  *
  * Usage:
- *   npm run sync:vercel-env -- --team YOUR_TEAM_SLUG --project mind-canvas
+ *   npm run sync:vercel-env -- --scope YOUR_TEAM_SLUG --project mind-canvas
  *
  * If .env.local has NEXTAUTH_URL=http://localhost:3001, pass the live URL:
- *   npm run sync:vercel-env -- --team ... --project ... --production-url https://mind-canvas.vercel.app
+ *   npm run sync:vercel-env -- --scope ... --project ... --production-url https://mind-canvas.vercel.app
  *
- * Or set VERCEL_TEAM / VERCEL_PROJECT. Optional: VERCEL_TOKEN for CI (never commit it).
+ * Or set VERCEL_TEAM / VERCEL_PROJECT (same as --scope/--project). Optional: VERCEL_TOKEN for CI (never commit it).
  */
 const { readFileSync, existsSync } = require("fs");
 const { spawnSync } = require("child_process");
@@ -19,13 +19,13 @@ const { homedir } = require("os");
 
 function parseArgs(argv) {
   const out = {
-    team: process.env.VERCEL_TEAM || "",
+    team: process.env.VERCEL_TEAM || process.env.VERCEL_SCOPE || "",
     project: process.env.VERCEL_PROJECT || "",
     productionUrl: "",
   };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
-    if (a === "--team" && argv[i + 1]) out.team = argv[++i];
+    if ((a === "--team" || a === "--scope") && argv[i + 1]) out.team = argv[++i];
     else if (a === "--project" && argv[i + 1]) out.project = argv[++i];
     else if (a === "--production-url" && argv[i + 1]) out.productionUrl = argv[++i];
   }
@@ -55,9 +55,14 @@ function parseDotEnv(filePath) {
 
 function vercelAuthJsonPath() {
   const h = homedir();
+  const local = process.env.LOCALAPPDATA || path.join(h, "AppData", "Local");
+  const roaming = process.env.APPDATA || path.join(h, "AppData", "Roaming");
+  // Current CLI (Windows): Roaming\com.vercel.cli\Data\auth.json
   const candidates = [
-    path.join(process.env.LOCALAPPDATA || path.join(h, "AppData", "Local"), "com.vercel.cli", "auth.json"),
-    path.join(process.env.APPDATA || path.join(h, "AppData", "Roaming"), "com.vercel.cli", "auth.json"),
+    path.join(roaming, "com.vercel.cli", "Data", "auth.json"),
+    path.join(local, "com.vercel.cli", "Data", "auth.json"),
+    path.join(local, "com.vercel.cli", "auth.json"),
+    path.join(roaming, "com.vercel.cli", "auth.json"),
   ];
   for (const p of candidates) {
     if (existsSync(p)) return p;
@@ -99,22 +104,22 @@ if (!hasVercelCliAuth()) {
       `  cd "${root}"\n` +
       "  npx vercel login\n\n" +
       "Complete the browser/device prompt, then run again:\n" +
-      "  npm run sync:vercel-env -- --team YOUR_TEAM_SLUG --project mind-canvas\n"
+      "  npm run sync:vercel-env -- --scope YOUR_TEAM_SLUG --project mind-canvas\n"
   );
   process.exit(1);
 }
 
 if (!team || !project) {
   console.error(
-    "Pass team and project for non-interactive link, e.g.:\n" +
-      "  npm run sync:vercel-env -- --team nagh2312s-projects --project mind-canvas\n" +
-      "Or set env vars VERCEL_TEAM and VERCEL_PROJECT.\n" +
+    "Pass scope (team slug) and project for non-interactive link, e.g.:\n" +
+      "  npm run sync:vercel-env -- --scope nagh2312s-projects --project mind-canvas\n" +
+      "Or set env vars VERCEL_TEAM (or VERCEL_SCOPE) and VERCEL_PROJECT.\n" +
       "Team slug appears in the dashboard URL: vercel.com/<team-slug>/..."
   );
   process.exit(1);
 }
 
-if (runVercel(["link", "--yes", "--team", team, "--project", project, "--non-interactive"]) !== 0) {
+if (runVercel(["link", "--yes", "--scope", team, "--project", project, "--non-interactive"]) !== 0) {
   process.exit(1);
 }
 
@@ -133,7 +138,7 @@ if (!url) {
 if (!productionUrl && /localhost|127\.0\.0\.1/i.test(url)) {
   console.error(
     "NEXTAUTH_URL in .env.local is localhost. For Vercel Production use your real URL, e.g.:\n" +
-      "  npm run sync:vercel-env -- --team ... --project ... --production-url https://YOUR-APP.vercel.app"
+      "  npm run sync:vercel-env -- --scope ... --project ... --production-url https://YOUR-APP.vercel.app"
   );
   process.exit(1);
 }

@@ -15,7 +15,8 @@ export default function LoginPage() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [googleAvailable, setGoogleAvailable] = useState(false);
-  const [signInReady, setSignInReady] = useState(true);
+  /** null = still checking server; false = hosting env not finished; true = OK */
+  const [signInReady, setSignInReady] = useState<boolean | null>(null);
 
   useEffect(() => {
     void (async () => {
@@ -66,13 +67,75 @@ export default function LoginPage() {
     }
   }, [email, password, mode, router]);
 
-  if (!signInReady) {
+  if (signInReady === null) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-violet-700 via-fuchsia-700 to-sky-600 px-6 text-center text-white">
-        <h1 className="font-display text-3xl">Mind Canvas is almost ready</h1>
-        <p className="mt-4 max-w-md text-sm text-white/85">
-          The person hosting this app still needs to finish one quick server setup so sign in can work safely. Check
-          back soon, or ask your teammate to finish the launch checklist.
+        <p className="text-sm text-white/90">Checking this site…</p>
+      </main>
+    );
+  }
+
+  if (!signInReady) {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-violet-700 via-fuchsia-700 to-sky-600 px-6 py-12 text-center text-white">
+        <h1 className="font-display text-3xl">Sign-in is not wired up on the live site yet</h1>
+        <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/90">
+          Your laptop file <code className="rounded bg-white/15 px-1.5 py-0.5 text-xs">.env.local</code> does not
+          travel to the internet. The host (for example Vercel) needs the same two values you use locally for secure
+          sessions.
+        </p>
+        <ol className="mt-8 max-w-lg list-decimal space-y-3 pl-5 text-left text-sm text-white/90">
+          <li>
+            Open{" "}
+            <a
+              href="https://vercel.com/dashboard"
+              className="font-semibold text-white underline underline-offset-2"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Vercel
+            </a>{" "}
+            → your project →{" "}
+            <strong>Settings</strong> →{" "}
+            <a
+              href="https://vercel.com/docs/projects/environment-variables"
+              className="font-semibold text-white underline underline-offset-2"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Environment Variables
+            </a>
+            .
+          </li>
+          <li>
+            Add <code className="rounded bg-white/15 px-1 text-xs">NEXTAUTH_SECRET</code> with a long random string
+            (copy the one from your local <code className="rounded bg-white/15 px-1 text-xs">.env.local</code>, or
+            generate a new one and update local too).
+          </li>
+          <li>
+            Add <code className="rounded bg-white/15 px-1 text-xs">NEXTAUTH_URL</code> set to this site&apos;s public
+            URL, for example <code className="rounded bg-white/15 px-1 text-xs">https://your-app.vercel.app</code>{" "}
+            (no path at the end).
+          </li>
+          <li>
+            For Google sign-in, also add <code className="rounded bg-white/15 px-1 text-xs">GOOGLE_CLIENT_ID</code> and{" "}
+            <code className="rounded bg-white/15 px-1 text-xs">GOOGLE_CLIENT_SECRET</code>, and add this URL in{" "}
+            <a
+              href="https://console.cloud.google.com/apis/credentials"
+              className="font-semibold text-white underline underline-offset-2"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Google Cloud OAuth
+            </a>
+            .
+          </li>
+          <li>
+            Click <strong>Redeploy</strong> on the latest deployment so the new variables load.
+          </li>
+        </ol>
+        <p className="mt-8 text-xs text-white/70">
+          After that, refresh this page. If you are not the host, send them this short list.
         </p>
       </main>
     );

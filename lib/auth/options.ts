@@ -27,7 +27,9 @@ export const authOptions: NextAuthOptions = {
         if (!user) return null;
         const ok = await bcrypt.compare(password, user.passwordHash);
         if (!ok) return null;
-        return { id: user.id, email: user.email, name: user.email.split("@")[0] };
+        if (!user.emailVerifiedAt) return null;
+        const display = user.name?.trim() || user.email.split("@")[0] || "there";
+        return { id: user.id, email: user.email, name: display };
       },
     }),
     ...(googleConfigured

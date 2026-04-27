@@ -66,17 +66,32 @@ export async function saveCloudJournal(payload: { body: string; date?: string })
 }
 
 export async function registerAccount(payload: {
+  name: string;
   email: string;
   password: string;
-}): Promise<{ ok: boolean; error?: string }> {
+  passwordConfirm: string;
+}): Promise<{
+  ok: boolean;
+  error?: string;
+  needsEmailVerification?: boolean;
+  devAutoVerified?: boolean;
+}> {
   const res = await fetch("/api/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
-  const data = (await res.json().catch(() => ({}))) as { error?: string };
+  const data = (await res.json().catch(() => ({}))) as {
+    error?: string;
+    needsEmailVerification?: boolean;
+    devAutoVerified?: boolean;
+  };
   if (!res.ok) return { ok: false, error: data.error ?? "Could not create account." };
-  return { ok: true };
+  return {
+    ok: true,
+    needsEmailVerification: Boolean(data.needsEmailVerification),
+    devAutoVerified: Boolean(data.devAutoVerified),
+  };
 }
 
 export async function fetchUserProfile(): Promise<{
